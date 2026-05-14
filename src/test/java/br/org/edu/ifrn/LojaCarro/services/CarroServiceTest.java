@@ -60,7 +60,7 @@ class CarroServiceTest {
 
         carroService.deleteById(id);
 
-        verify(carroRepository, times(10)).deleteById(id);
+        verify(carroRepository, times(10)).deleteById(id); //v2
         verifyNoMoreInteractions(carroRepository);
     }
 
