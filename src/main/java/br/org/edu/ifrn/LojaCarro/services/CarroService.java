@@ -1,6 +1,7 @@
 
 package br.org.edu.ifrn.LojaCarro.services;
 
+import br.org.edu.ifrn.LojaCarro.CarroException;
 import br.org.edu.ifrn.LojaCarro.model.Carro;
 import br.org.edu.ifrn.LojaCarro.repository.CarroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +17,23 @@ public class CarroService {
     public CarroRepository carroRepository;
 
     public Carro save(Carro c) {
+        validarModelo(c.getModelo());  // Valida o modelo antes de salvar
         return carroRepository.save(c);
     }
 
     // Novo método para deletar por ID
     public void deleteById(Long id) {
+        if(id <= 0){
+            throw new CarroException("O ID do carro não pode ser negativo. ID fornecido: " + id);
+        }
         carroRepository.deleteById(id);
     }
 
     // Novo método para pesquisar por ID
     public Optional<Carro> findById(Long id) {
+        if(id <= 0){
+            throw new CarroException("O ID do carro não pode ser negativo. ID fornecido: " + id);
+        }
         return carroRepository.findById(id);
     }
 
@@ -36,6 +44,17 @@ public class CarroService {
 
     // Método para atualizar (usa o save existente, mas pode ser renomeado se preferir)
     public Carro update(Carro c) {
+        validarModelo(c.getModelo());  // Valida o modelo antes de atualizar
         return carroRepository.save(c);  // Retorna o carro salvo para feedback
+    }
+
+    // Validação do modelo
+    private void validarModelo(String modelo) {
+        if (modelo == null || modelo.trim().isEmpty()) {
+            throw new CarroException("O modelo do carro não pode estar vazio.");
+        }
+        if (modelo.length() >= 10) {
+            throw new CarroException("O modelo do carro deve ter menos de 10 caracteres. Tamanho atual: " + modelo.length());
+        }
     }
 }
