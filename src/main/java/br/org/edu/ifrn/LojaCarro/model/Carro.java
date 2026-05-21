@@ -10,10 +10,22 @@ public class Carro {
     private Long id;
     String modelo;
     int ano;
+    double preco;
+
+    // No-arg constructor necessário para desserialização (Jackson)
+    public Carro() {
+    }
 
     public Carro(String modelo, int ano) {
         this.modelo = modelo;
         this.ano = ano;
+        this.preco = 0.0;
+    }
+
+    public Carro(String modelo, int ano, double preco) {
+        this.modelo = modelo;
+        this.ano = ano;
+        this.preco = preco;
     }
 
     public Long getId() {
@@ -38,5 +50,13 @@ public class Carro {
 
     public void setAno(int ano) {
         this.ano = ano;
+    }
+
+    public double getPreco() {
+        return preco;
+    }
+
+    public void setPreco(double preco) {
+        this.preco = preco;
     }
 }

@@ -146,6 +146,22 @@ public class CarroServiceTest {
     }
 
     @Test
+    @DisplayName("save: Deve lançar exceção quando preço for negativo")
+    void testSaveCarroComPrecoNegativo() {
+        // Arrange
+        Carro carroPrecoNegativo = new Carro("Civic", 2023);
+        carroPrecoNegativo.setPreco(-5000.0);
+
+        // Act & Assert
+        CarroException exception = assertThrows(CarroException.class, () -> {
+            carroService.save(carroPrecoNegativo);
+        });
+
+        assertTrue(exception.getMessage().contains("O preço do carro não pode ser negativo"));
+        verify(carroRepository, never()).save(any());
+    }
+
+    @Test
     @DisplayName("deleteById: Deve lançar exceção quando ID é negativo")
     void testDeleteByIdNegativo() {
         // Arrange
@@ -280,6 +296,8 @@ public class CarroServiceTest {
     @DisplayName("update: Deve atualizar carro com modelo válido (menos de 10 caracteres)")
     void testUpdateCarroValido() {
         // Arrange
+        carroValido.setId(1L);
+        when(carroRepository.existsById(1L)).thenReturn(true);
         when(carroRepository.save(carroValido)).thenReturn(carroValido);
 
         // Act
@@ -297,6 +315,9 @@ public class CarroServiceTest {
         // Arrange
         Carro carroVazio = new Carro("", 2023);
 
+        carroVazio.setId(2L);
+        when(carroRepository.existsById(2L)).thenReturn(true);
+
         // Act & Assert
         CarroException exception = assertThrows(CarroException.class, () -> {
             carroService.update(carroVazio);
@@ -311,6 +332,9 @@ public class CarroServiceTest {
     void testUpdateCarroComModeloNull() {
         // Arrange
         Carro carroNull = new Carro(null, 2023);
+
+        carroNull.setId(3L);
+        when(carroRepository.existsById(3L)).thenReturn(true);
 
         // Act & Assert
         CarroException exception = assertThrows(CarroException.class, () -> {
@@ -327,6 +351,9 @@ public class CarroServiceTest {
         // Arrange (modelo com 15 caracteres)
         Carro carroGrande = new Carro("FordMustangGT500", 2023);
 
+        carroGrande.setId(4L);
+        when(carroRepository.existsById(4L)).thenReturn(true);
+
         // Act & Assert
         CarroException exception = assertThrows(CarroException.class, () -> {
             carroService.update(carroGrande);
@@ -341,6 +368,8 @@ public class CarroServiceTest {
     void testUpdateCarroComModeloLimite() {
         // Arrange (modelo com 9 caracteres: "Civic2023")
         Carro carroLimite = new Carro("Civic2023", 2023);
+        carroLimite.setId(5L);
+        when(carroRepository.existsById(5L)).thenReturn(true);
         when(carroRepository.save(carroLimite)).thenReturn(carroLimite);
 
         // Act
@@ -357,6 +386,8 @@ public class CarroServiceTest {
     void testUpdateCarroComModeloSoEspacos() {
         // Arrange
         Carro carroEspacos = new Carro("   ", 2023);
+        carroEspacos.setId(6L);
+        when(carroRepository.existsById(6L)).thenReturn(true);
 
         // Act & Assert
         CarroException exception = assertThrows(CarroException.class, () -> {
@@ -364,6 +395,23 @@ public class CarroServiceTest {
         });
 
         assertEquals("O modelo do carro não pode estar vazio.", exception.getMessage());
+        verify(carroRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("update: Deve lançar exceção quando carro inexistente")
+    void testUpdateCarroInexistente() {
+        // Arrange
+        Carro c = new Carro("Civic", 2023);
+        c.setId(999L);
+        when(carroRepository.existsById(999L)).thenReturn(false);
+
+        // Act & Assert
+        CarroException exception = assertThrows(CarroException.class, () -> {
+            carroService.update(c);
+        });
+
+        assertTrue(exception.getMessage().contains("não encontrado para atualização"));
         verify(carroRepository, never()).save(any());
     }
 }

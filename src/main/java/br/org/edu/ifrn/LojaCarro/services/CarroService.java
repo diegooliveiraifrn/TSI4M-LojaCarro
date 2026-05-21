@@ -18,6 +18,7 @@ public class CarroService {
 
     public Carro save(Carro c) {
         validarModelo(c.getModelo());  // Valida o modelo antes de salvar
+        validarPreco(c.getPreco());
         return carroRepository.save(c);
     }
 
@@ -44,7 +45,14 @@ public class CarroService {
 
     // Método para atualizar (usa o save existente, mas pode ser renomeado se preferir)
     public Carro update(Carro c) {
+        if (c.getId() == null) {
+            throw new CarroException("O ID do carro para atualização não pode ser nulo.");
+        }
+        if (!carroRepository.existsById(c.getId())) {
+            throw new CarroException("Carro com ID " + c.getId() + " não encontrado para atualização.");
+        }
         validarModelo(c.getModelo());  // Valida o modelo antes de atualizar
+        validarPreco(c.getPreco());
         return carroRepository.save(c);  // Retorna o carro salvo para feedback
     }
 
@@ -55,6 +63,12 @@ public class CarroService {
         }
         if (modelo.length() >= 10) {
             throw new CarroException("O modelo do carro deve ter menos de 10 caracteres. Tamanho atual: " + modelo.length());
+        }
+    }
+
+    private void validarPreco(double preco) {
+        if (preco < 0) {
+            throw new CarroException("O preço do carro não pode ser negativo. Valor fornecido: " + preco);
         }
     }
 }
