@@ -7,6 +7,7 @@ import br.org.edu.ifrn.LojaCarro.repository.CarroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +44,29 @@ public class CarroService {
         return carroRepository.findAll();
     }
 
+    public Optional<Carro> findByModelo(String modelo) {
+        validarModelo(modelo);
+        return carroRepository.findFirstByModelo(modelo);
+    }
+
+    public Carro saveFromLegacy(String modelo, double preco) {
+        Carro carro = new Carro(modelo, LocalDate.now().getYear(), preco);
+        return save(carro);
+    }
+
+    public Carro updateByModelo(String modelo, double preco) {
+        Carro carro = localizarCarroPorModelo(modelo);
+        validarPreco(preco);
+        carro.setPreco(preco);
+        return carroRepository.save(carro);
+    }
+
+    public Carro deleteByModelo(String modelo) {
+        Carro carro = localizarCarroPorModelo(modelo);
+        carroRepository.delete(carro);
+        return carro;
+    }
+
     // Método para atualizar (usa o save existente, mas pode ser renomeado se preferir)
     public Carro update(Carro c) {
         if (c.getId() == null) {
@@ -70,5 +94,11 @@ public class CarroService {
         if (preco < 0) {
             throw new CarroException("O preço do carro não pode ser negativo. Valor fornecido: " + preco);
         }
+    }
+
+    private Carro localizarCarroPorModelo(String modelo) {
+        validarModelo(modelo);
+        return carroRepository.findFirstByModelo(modelo)
+                .orElseThrow(() -> new CarroException("Carro com modelo " + modelo + " não encontrado."));
     }
 }
