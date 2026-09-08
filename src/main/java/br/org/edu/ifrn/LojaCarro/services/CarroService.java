@@ -1,4 +1,3 @@
-
 package br.org.edu.ifrn.LojaCarro.services;
 
 import br.org.edu.ifrn.LojaCarro.CarroException;
@@ -85,8 +84,8 @@ public class CarroService {
         if (modelo == null || modelo.trim().isEmpty()) {
             throw new CarroException("O modelo do carro não pode estar vazio.");
         }
-        if (modelo.length() >= 10) {
-            throw new CarroException("O modelo do carro deve ter menos de 10 caracteres. Tamanho atual: " + modelo.length());
+        if (modelo.length() >= 5) {
+            throw new CarroException("O modelo do carro deve ter menos de 5 caracteres. Tamanho atual: " + modelo.length());
         }
     }
 
